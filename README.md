@@ -142,6 +142,10 @@ function doGet(e) {
 
 ## Release Notes
 
+### 1.11.0
+- Fixed credential validation to handle numeric responses (1/0) from Google Apps Script
+- Added support for both boolean and numeric authentication responses
+
 ### 1.10.0
 - Fixed webview panel not displaying content
 - Added webview type declaration in package.json

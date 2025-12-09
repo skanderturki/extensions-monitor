@@ -284,11 +284,18 @@ function promptForPassword(extensionID) {
 			} else {
 				checkCredentials(email, password)
 					.then(check => {
-						if (check.authenticated && check.validity) {
+						console.log('Credential check response:', JSON.stringify(check));
+						// Check for various success indicators from the API
+						// Handle both boolean (true) and number (1) responses
+						const isAuthenticated = check.authenticated === true || check.authenticated === 1 || check.success === true;
+						const isValid = check.validity === true || check.validity === 1 || check.valid === true || check.validity === undefined;
+
+						if (isAuthenticated && isValid) {
 							vscode.window.showInformationMessage('Password correct, access granted!');
 							process.context.globalState.update('isCurrentlyBlocked', false);
 							lastUnlockTime = Date.now(); // Set grace period
 						} else {
+							console.log('Auth failed - authenticated:', check.authenticated, 'validity:', check.validity);
 							vscode.window.showErrorMessage('Invalid credentials. Access denied.');
 							// Optionally, you can re-prompt the user if the password is incorrect
 							promptForPassword(extensionID); // Recursive call to keep asking for the correct password
