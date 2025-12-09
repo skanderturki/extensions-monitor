@@ -1,0 +1,7 @@
+*.vsix
+
+.env
+
+.howToPublishExtension
+
+test/node_modules/

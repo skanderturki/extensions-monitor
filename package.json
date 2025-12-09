@@ -1,0 +1,140 @@
+{
+  "name": "extensions-monitor",
+  "displayName": "extensions-monitor",
+  "description": "This is an extension that is useful for academic purposes, it monitors the extensions installed on VSCode in situations where you want to block/know what are the extensions thatinstalled  in case students are taking an exam and you need to make sure that do not install AI extensions. But other scenarios are also possible.",
+  "version": "1.5.0",
+  "license": "Commercial",
+  "publisher": "skanderturki",
+  "engines": {
+    "vscode": "^1.73.0"
+  },
+  "keywords": [
+    "VSCode extensions",
+    "Monitor extensions",
+    "Block extensions",
+    "VSCode exams",
+    "Technical interviews"
+  ],
+  "icon": "icon.png",
+  "categories": [
+    "Other"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skanderturki/extensions-monitor"
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.listInstalledExtensions",
+        "title": "List Installed Extensions"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "extension.listInstalledExtensions",
+        "key": "ctrl+shift+l",
+        "mac": "cmd+shift+l",
+        "when": "editorTextFocus"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "properties": {
+        "monitoredExtensions.blockedList": {
+          "type": "array",
+          "default": [],
+          "description": "List of extensions to block.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "monitoredExtensions.whiteList": {
+          "type": "array",
+          "default": [
+            "ecmel.vscode-html-css",
+            "skanderturki.extensions-monitor",
+            "skanderturki.html-snippets-ska",
+            "christian-kohler.npm-intellisense",
+            "redhat.vscode-xml",
+            "rangav.vscode-thunder-client",
+            "esbenp.prettier-vscode",
+            "mongodb.mongodb-vscode",
+            "ritwickdey.liveserver",
+            "zainchen.json",
+            "formulahendry.vscode-mysql",
+            "mtxr.sqltools-driver-mysql",
+            "cweijan.vscode-mysql-client2",
+            "ms-vscode.vscode-typescript-next",
+            "cweijan.dbclient-jdbc",
+            "ms-toolsai.jupyter-keymap",
+            "ms-vscode.cpptools",
+            "ms-toolsai.jupyter",
+            "ms-python.vscode-pylance",
+            "ms-python.python",
+            "twxs.cmake",
+            "ms-vscode.cmake-tools",
+            "redhat.java",
+            "ms-azuretools.vscode-docker",
+            "dbaeumer.vscode-eslint",
+            "ms-vscode.cpptools-themes",
+            "vscjava.vscode-java-debug",
+            "vscjava.vscode-maven",
+            "ms-vscode-remote.remote-wsl",
+            "ecmel.vscode-html-css",
+            "xabikos.JavaScriptSnippets",
+            "standard.vscode-standard",
+            "Wscats.html-snippets",
+            "numso.prettier-standard-vscode",
+            "cmstead.js-codeformer",
+            "yandeu.five-server",
+            "negokaz.live-server-preview",
+            "ms-vscode.live-serve",
+            "ritwickdey.liveserver"
+          ],
+          "description": "List of extensions to block.",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "extensions-monitor-explorer",
+          "title": "Extensions monitor",
+          "icon": "actionbar_icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "extensions-monitor-explorer": [
+        {
+          "id": "extensions-monitor-view",
+          "name": "Extensions Monitor View"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.9",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.73.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1",
+    "eslint": "^9.13.0"
+  },
+  "dependencies": {
+    "crypto-js": "^4.2.0"
+  }
+}
