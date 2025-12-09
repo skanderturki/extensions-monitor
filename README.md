@@ -142,6 +142,12 @@ function doGet(e) {
 
 ## Release Notes
 
+### 1.9.0
+- Enhanced sidebar panel with detailed status information
+- Added SVG icons for EXAM/LECTURE modes
+- Added feature list with icons explaining current restrictions
+- Improved visual styling with status badges
+
 ### 1.8.0
 - Updated Google Apps Script deployment URL
 

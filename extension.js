@@ -323,10 +323,72 @@ class MyViewProvider {
 			};
 			this._view.webview.html = `
 				<html>
-					<body style="background-color: #f44336; color: white; padding: 20px; text-align: center;">
+					<head>
+						<style>
+							body {
+								background-color: #f44336;
+								color: white;
+								padding: 20px;
+								text-align: center;
+								font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+							}
+							.icon { margin: 10px auto; }
+							.status-badge {
+								display: inline-block;
+								background: rgba(255,255,255,0.2);
+								padding: 5px 15px;
+								border-radius: 20px;
+								margin: 10px 0;
+								font-weight: bold;
+							}
+							.feature-list {
+								text-align: left;
+								margin: 20px auto;
+								max-width: 250px;
+							}
+							.feature-item {
+								display: flex;
+								align-items: center;
+								margin: 8px 0;
+								font-size: 13px;
+							}
+							.feature-icon {
+								margin-right: 10px;
+								width: 20px;
+								text-align: center;
+							}
+							h1 { margin: 10px 0; }
+							h2 { margin: 5px 0; font-weight: normal; opacity: 0.9; }
+						</style>
+					</head>
+					<body>
+						<div class="icon">
+							<svg width="64" height="64" viewBox="0 0 24 24" fill="white">
+								<path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+							</svg>
+						</div>
 						<h1>EXAM MODE</h1>
-						<h2>Monitor Active</h2>
-						<p>AI extensions are being blocked</p>
+						<div class="status-badge">ACTIVE</div>
+						<h2>AI Extension Blocking Enabled</h2>
+
+						<div class="feature-list">
+							<div class="feature-item">
+								<span class="feature-icon">&#10060;</span>
+								<span>AI extensions are blocked</span>
+							</div>
+							<div class="feature-item">
+								<span class="feature-icon">&#128065;</span>
+								<span>Activity is being monitored</span>
+							</div>
+							<div class="feature-item">
+								<span class="feature-icon">&#128274;</span>
+								<span>Instructor unlock required</span>
+							</div>
+							<div class="feature-item">
+								<span class="feature-icon">&#128221;</span>
+								<span>Actions logged to desktop</span>
+							</div>
+						</div>
 					</body>
 				</html>
 			`;
@@ -338,10 +400,72 @@ class MyViewProvider {
 			};
 			this._view.webview.html = `
 				<html>
-					<body style="background-color: #2196F3; color: white; padding: 20px; text-align: center;">
+					<head>
+						<style>
+							body {
+								background-color: #2196F3;
+								color: white;
+								padding: 20px;
+								text-align: center;
+								font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+							}
+							.icon { margin: 10px auto; }
+							.status-badge {
+								display: inline-block;
+								background: rgba(255,255,255,0.2);
+								padding: 5px 15px;
+								border-radius: 20px;
+								margin: 10px 0;
+								font-weight: bold;
+							}
+							.feature-list {
+								text-align: left;
+								margin: 20px auto;
+								max-width: 250px;
+							}
+							.feature-item {
+								display: flex;
+								align-items: center;
+								margin: 8px 0;
+								font-size: 13px;
+							}
+							.feature-icon {
+								margin-right: 10px;
+								width: 20px;
+								text-align: center;
+							}
+							h1 { margin: 10px 0; }
+							h2 { margin: 5px 0; font-weight: normal; opacity: 0.9; }
+						</style>
+					</head>
+					<body>
+						<div class="icon">
+							<svg width="64" height="64" viewBox="0 0 24 24" fill="white">
+								<path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
+							</svg>
+						</div>
 						<h1>LECTURE MODE</h1>
-						<h2>Monitor Inactive</h2>
-						<p>AI extensions are allowed</p>
+						<div class="status-badge">INACTIVE</div>
+						<h2>AI Extension Blocking Disabled</h2>
+
+						<div class="feature-list">
+							<div class="feature-item">
+								<span class="feature-icon">&#9989;</span>
+								<span>AI extensions are allowed</span>
+							</div>
+							<div class="feature-item">
+								<span class="feature-icon">&#128218;</span>
+								<span>Learning mode active</span>
+							</div>
+							<div class="feature-item">
+								<span class="feature-icon">&#128275;</span>
+								<span>No restrictions applied</span>
+							</div>
+							<div class="feature-item">
+								<span class="feature-icon">&#128161;</span>
+								<span>Use AI tools freely</span>
+							</div>
+						</div>
 					</body>
 				</html>
 			`;
