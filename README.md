@@ -142,6 +142,12 @@ function doGet(e) {
 
 ## Release Notes
 
+### 1.10.0
+- Fixed webview panel not displaying content
+- Added webview type declaration in package.json
+- Added proper HTML DOCTYPE and meta tags
+- Enabled scripts in webview options
+
 ### 1.9.0
 - Enhanced sidebar panel with detailed status information
 - Added SVG icons for EXAM/LECTURE modes

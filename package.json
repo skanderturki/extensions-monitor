@@ -2,7 +2,7 @@
   "name": "extensions-monitor",
   "displayName": "extensions-monitor",
   "description": "This is an extension that is useful for academic purposes, it monitors the extensions installed on VSCode in situations where you want to block/know what are the extensions thatinstalled  in case students are taking an exam and you need to make sure that do not install AI extensions. But other scenarios are also possible.",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "license": "Commercial",
   "publisher": "skanderturki",
   "engines": {
@@ -115,8 +115,9 @@
     "views": {
       "extensions-monitor-explorer": [
         {
+          "type": "webview",
           "id": "extensions-monitor-view",
-          "name": "Extensions Monitor View"
+          "name": "Extensions Monitor"
         }
       ]
     }

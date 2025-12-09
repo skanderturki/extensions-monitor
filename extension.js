@@ -306,9 +306,15 @@ function promptForPassword(extensionID) {
 }
 
 class MyViewProvider {
-	resolveWebviewView(webviewView) {
+	resolveWebviewView(webviewView, context, token) {
 		// Store reference to set badge
 		this._view = webviewView;
+
+		// Configure webview options
+		webviewView.webview.options = {
+			enableScripts: true
+		};
+
 		this.updateContent(isExamModeActive);
 	}
 
@@ -322,8 +328,11 @@ class MyViewProvider {
 				tooltip: 'EXAM MODE - AI extensions blocked'
 			};
 			this._view.webview.html = `
-				<html>
+				<!DOCTYPE html>
+				<html lang="en">
 					<head>
+						<meta charset="UTF-8">
+						<meta name="viewport" content="width=device-width, initial-scale=1.0">
 						<style>
 							body {
 								background-color: #f44336;
@@ -399,8 +408,11 @@ class MyViewProvider {
 				tooltip: 'Lecture Mode - AI extensions allowed'
 			};
 			this._view.webview.html = `
-				<html>
+				<!DOCTYPE html>
+				<html lang="en">
 					<head>
+						<meta charset="UTF-8">
+						<meta name="viewport" content="width=device-width, initial-scale=1.0">
 						<style>
 							body {
 								background-color: #2196F3;
