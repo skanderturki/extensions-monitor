@@ -1,6 +1,31 @@
-const WEB_API_URL = "https://script.google.com/macros/s/AKfycbylUb2H5SI7lv359iX4YdFJ2jytOaCW_6c5YN6xMzf9Up0HoJShETFZarqs2gVHwiJP/exec";
+const WEB_API_URL = "https://script.google.com/macros/s/AKfycbyRrx42FbepIjER0FXUtX6S7fwat7YUBzY-mOST_upOVkNWqGWsFlPIY0ornUL7oM64/exec";
 
 const vscode = require('vscode');
+
+// Check if the extension is remotely activated (from Google Sheet)
+const checkActivationStatus = () => {
+  return new Promise((resolve, reject) => {
+    fetch(WEB_API_URL, {
+      method: 'GET',
+      redirect: 'follow',
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Activation status:', data);
+        resolve(data.isActive === true);
+      })
+      .catch((error) => {
+        console.error('Activation check error:', error);
+        // Default to active if network fails (fail-safe for exams)
+        resolve(true);
+      });
+  });
+}
 
 const checkCredentials = (email, password) => {
   return new Promise((resolve, reject) => {
@@ -40,4 +65,4 @@ const checkCredentials = (email, password) => {
 }
 
 
-module.exports = { checkCredentials };
+module.exports = { checkCredentials, checkActivationStatus };

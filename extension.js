@@ -3,7 +3,7 @@ const TIMEOUT = 15000;
 const vscode = require('vscode');
 const path = require('path');
 const fs = require('fs');
-const { checkCredentials } = require('./password');
+const { checkCredentials, checkActivationStatus } = require('./password');
 
 // Track last unlock time to provide grace period after password entry
 let lastUnlockTime = 0;
@@ -11,6 +11,12 @@ let lastUnlockTime = 0;
 // Status bar items for visual indication (left and right)
 let statusBarItemLeft;
 let statusBarItemRight;
+
+// Track if exam mode is active (from remote server)
+let isExamModeActive = true; // Default to true (fail-safe)
+
+// Reference to webview provider for updating UI
+let viewProviderInstance;
 
 // Function to write to the log file
 const writeToLogFile = (logFilePath, message) => {
@@ -92,6 +98,11 @@ const checkCopilotSettings = () => {
 
 const checkBlockedExtensions = () => {
 
+	// If exam mode is not active, skip blocking
+	if (!isExamModeActive) {
+		return;
+	}
+
 	// If the editor is currently blocked we don't re-check,
 	// the user has to enter password or re-start IDE
 	let isCurrentlyBlocked = process.context.globalState.get('isCurrentlyBlocked');
@@ -146,31 +157,55 @@ const checkBlockedExtensions = () => {
 
 }
 
+// Update UI based on exam mode status
+function updateUIForMode(isActive) {
+	if (isActive) {
+		// EXAM MODE - Yellow/Red warnings
+		statusBarItemLeft.text = "$(shield) EXAM MODE - Monitor Active";
+		statusBarItemLeft.tooltip = "Extensions Monitor is active - AI extensions are blocked";
+		statusBarItemLeft.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
+		statusBarItemLeft.show();
+
+		statusBarItemRight.text = "$(eye) MONITORED";
+		statusBarItemRight.tooltip = "This VSCode instance is being monitored for AI extensions";
+		statusBarItemRight.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');
+		statusBarItemRight.show();
+	} else {
+		// LECTURE MODE - Green, non-intrusive
+		statusBarItemLeft.text = "$(book) LECTURE MODE";
+		statusBarItemLeft.tooltip = "Extensions Monitor is in lecture mode - AI extensions allowed";
+		statusBarItemLeft.backgroundColor = undefined;
+		statusBarItemLeft.show();
+
+		statusBarItemRight.hide();
+	}
+
+	// Update webview if available
+	if (viewProviderInstance && viewProviderInstance._view) {
+		viewProviderInstance.updateContent(isActive);
+	}
+}
+
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
 
-	// Create LEFT status bar item with warning background (highly visible)
+	// Create LEFT status bar item (initially hidden until status check completes)
 	statusBarItemLeft = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
-	statusBarItemLeft.text = "$(shield) EXAM MODE - Monitor Active";
-	statusBarItemLeft.tooltip = "Extensions Monitor is active - AI extensions are blocked";
-	statusBarItemLeft.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
+	statusBarItemLeft.text = "$(sync~spin) Checking...";
+	statusBarItemLeft.tooltip = "Checking extension monitor status...";
 	statusBarItemLeft.show();
 	context.subscriptions.push(statusBarItemLeft);
 
-	// Create RIGHT status bar item with error background (red, highly visible)
+	// Create RIGHT status bar item (initially hidden)
 	statusBarItemRight = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-	statusBarItemRight.text = "$(eye) MONITORED";
-	statusBarItemRight.tooltip = "This VSCode instance is being monitored for AI extensions";
-	statusBarItemRight.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');
-	statusBarItemRight.show();
 	context.subscriptions.push(statusBarItemRight);
 
-	// register action bar view
-	const viewProvider = new MyViewProvider(context);
+	// Register action bar view
+	viewProviderInstance = new MyViewProvider(context);
 	context.subscriptions.push(
-		vscode.window.registerWebviewViewProvider('extensions-monitor-view', viewProvider)
+		vscode.window.registerWebviewViewProvider('extensions-monitor-view', viewProviderInstance)
 	);
 
 	// Print in a file the date if this extension is still installed
@@ -184,7 +219,27 @@ function activate(context) {
 	// Check unwanted extensions
 	process.context = context;
 	context.globalState.update('isCurrentlyBlocked', false);
-	checkExtensions();
+
+	// Check activation status from remote server at startup
+	checkActivationStatus()
+		.then(isActive => {
+			isExamModeActive = isActive;
+			updateUIForMode(isActive);
+
+			if (isActive) {
+				writeToLogFile(process.logFilePath, "EXAM MODE activated\n");
+				checkExtensions();
+			} else {
+				writeToLogFile(process.logFilePath, "LECTURE MODE - monitoring disabled\n");
+			}
+		})
+		.catch(err => {
+			console.error('Failed to check activation status:', err);
+			// Default to exam mode on error (fail-safe)
+			isExamModeActive = true;
+			updateUIForMode(true);
+			checkExtensions();
+		});
 
 	const interval = setInterval(checkExtensions, TIMEOUT);
 
@@ -254,23 +309,43 @@ class MyViewProvider {
 	resolveWebviewView(webviewView) {
 		// Store reference to set badge
 		this._view = webviewView;
+		this.updateContent(isExamModeActive);
+	}
 
-		// Set badge on activity bar icon (shows "ON" indicator)
-		webviewView.badge = {
-			value: 1,
-			tooltip: 'Exam Monitor is ACTIVE'
-		};
+	updateContent(isActive) {
+		if (!this._view) return;
 
-		// Define the HTML content of the webview
-		webviewView.webview.html = `
-			<html>
-				<body style="background-color: #4CAF50; color: white; padding: 20px; text-align: center;">
-					<h1>EXAM MODE</h1>
-					<h2>Monitor Active</h2>
-					<p>AI extensions are being blocked</p>
-				</body>
-			</html>
-		`;
+		if (isActive) {
+			// EXAM MODE
+			this._view.badge = {
+				value: 1,
+				tooltip: 'EXAM MODE - AI extensions blocked'
+			};
+			this._view.webview.html = `
+				<html>
+					<body style="background-color: #f44336; color: white; padding: 20px; text-align: center;">
+						<h1>EXAM MODE</h1>
+						<h2>Monitor Active</h2>
+						<p>AI extensions are being blocked</p>
+					</body>
+				</html>
+			`;
+		} else {
+			// LECTURE MODE
+			this._view.badge = {
+				value: 0,
+				tooltip: 'Lecture Mode - AI extensions allowed'
+			};
+			this._view.webview.html = `
+				<html>
+					<body style="background-color: #2196F3; color: white; padding: 20px; text-align: center;">
+						<h1>LECTURE MODE</h1>
+						<h2>Monitor Inactive</h2>
+						<p>AI extensions are allowed</p>
+					</body>
+				</html>
+			`;
+		}
 	}
 }
 

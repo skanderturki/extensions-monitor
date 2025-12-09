@@ -30,9 +30,18 @@ When a blocked extension is detected:
 3. After unlock, a 15-second grace period prevents immediate re-prompting
 4. Credentials are verified against a secure backend
 
+### Remote Activation Control
+Administrators can remotely activate/deactivate the extension across all machines:
+
+- **EXAM MODE** (Active): AI extensions are blocked, yellow/red status bars shown
+- **LECTURE MODE** (Inactive): AI extensions allowed, blue status bar shown
+
+The activation status is checked once at VSCode startup from a Google Sheet, allowing centralized control over all student machines.
+
 ### Activity Logging
 - Logs extension monitoring activity to `~/Desktop/log/extensions_log.txt`
 - Tracks when the extension is active on the IDE
+- Logs mode changes (EXAM MODE / LECTURE MODE)
 
 ## Installation
 
@@ -97,6 +106,29 @@ If a student needs temporary access (e.g., to uninstall a blocked extension):
 2. The IDE will be unlocked for 15 seconds
 3. During this grace period, the student can modify their extensions
 
+### Remote Activation Setup
+To enable remote activation control via Google Sheets:
+
+1. Create a "Settings" sheet in your Google Spreadsheet
+2. Add a boolean value (`TRUE` or `FALSE`) in cell B1
+3. Add this `doGet` function to your Google Apps Script:
+
+```javascript
+function doGet(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Settings");
+  var status = sheet.getRange("B1").getValue();
+
+  return ContentService
+    .createTextOutput(JSON.stringify({ isActive: status === true }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+```
+
+4. Deploy the script as a web app
+5. Set B1 to `TRUE` for exam mode, `FALSE` for lecture mode
+
+**Note**: Students must restart VSCode to pick up activation changes.
+
 ## Requirements
 
 - VSCode version 1.73.0 or higher
@@ -109,6 +141,16 @@ If a student needs temporary access (e.g., to uninstall a blocked extension):
 - Extensions installed after the check interval (15 seconds) won't be detected until the next cycle
 
 ## Release Notes
+
+### 1.8.0
+- Updated Google Apps Script deployment URL
+
+### 1.7.0
+- Added remote activation control via Google Sheets
+- New EXAM MODE / LECTURE MODE toggle
+- Status checked at VSCode startup
+- Updated UI: red sidebar for exam mode, blue for lecture mode
+- Improved README with setup instructions
 
 ### 1.6.0
 - Improved README documentation
